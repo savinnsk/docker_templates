@@ -1,0 +1,11 @@
+services:
+  nginx:
+    image: nginx_image:mainline-alpine3.18
+    build:
+      context: .
+      dockerfile: dockerfile_nginx
+    container_name: nginx_container
+    ports:
+      - "9000:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf 
