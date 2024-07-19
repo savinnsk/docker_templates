@@ -1,0 +1,35 @@
+# Use a imagem base do Golang 1.22
+FROM golang:1.22
+
+# Defina variáveis de ambiente
+ENV GOOS=linux
+ENV GOARCH=amd64
+ENV GOPROXY=https://proxy.golang.org,direct
+ENV PORT=3000
+
+# Defina o diretório de trabalho dentro do contêiner
+WORKDIR /go/src/
+
+# Copie o código fonte da sua aplicação para o diretório de trabalho
+COPY ./src /go/src
+
+# Instale o OpenSSL (se necessário) e gere a chave privada
+RUN apt-get update && \
+    apt-get install -y openssl && \
+    openssl genpkey -algorithm RSA -out root-ca.key && \
+    cp ./root-ca.key /usr/share/ca-certificates/root-ca.crt && \
+    cp ./root-ca.key /usr/local/share/ca-certificates/root-ca.pem && \
+    update-ca-certificates
+
+# Execute o comando go mod tidy para gerenciar as dependências do módulo
+RUN go mod tidy
+
+# Compile o código fonte para Linux e Windows
+RUN go build -o linux/app
+RUN GOOS=windows GOARCH=amd64 go build -o win/app.exe
+
+# Altere as permissões do arquivo de aplicação Linux para torná-lo executável
+RUN chmod +x ./linux/app
+
+# Defina o comando padrão a ser executado quando o contêiner for iniciado
+CMD ["./linux/app"]

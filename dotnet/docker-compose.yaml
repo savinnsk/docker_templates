@@ -9,7 +9,7 @@ services:
       - "8080:8080"
       - "5016:5616"
     environment:
-#      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080;http://+:5016
     volumes:
       - ./src:/app
